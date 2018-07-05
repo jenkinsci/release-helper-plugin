@@ -1,14 +1,7 @@
 package rocks.inspectit.releaseplugin.releasenotes;
 
-import static com.google.common.base.Predicates.and;
-import static com.google.common.base.Predicates.notNull;
-import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.jenkinsci.plugins.github.config.GitHubServerConfig.GITHUB_URL;
 import static org.jenkinsci.plugins.github.config.GitHubServerConfig.tokenFor;
 import static org.jenkinsci.plugins.github.config.GitHubServerConfig.withHost;
-import static org.jenkinsci.plugins.github.internal.GitHubClientCacheOps.toCacheDir;
-import static org.jenkinsci.plugins.github.util.FluentIterableWrapper.from;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -16,9 +9,8 @@ import java.net.HttpURLConnection;
 import java.net.Proxy;
 import java.net.SocketAddress;
 import java.net.URL;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
-
-import jenkins.model.Jenkins;
 
 import org.jenkinsci.plugins.github.GitHubPlugin;
 import org.jenkinsci.plugins.github.config.GitHubServerConfig;
@@ -29,9 +21,10 @@ import org.kohsuke.github.RateLimitHandler;
 
 import com.cloudbees.jenkins.GitHubRepositoryName;
 import com.cloudbees.jenkins.GitHubWebHook;
-import com.squareup.okhttp.Cache;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.OkUrlFactory;
+
+import jenkins.model.Jenkins;
 
 public class GHSerializableConnection implements Serializable{
 
@@ -54,7 +47,18 @@ public class GHSerializableConnection implements Serializable{
 
 		totalRepoName = String.format("%s/%s", ghrpn.getUserName(), ghrpn.getRepositoryName());
 		
-		GitHubServerConfig ghsc = from(GitHubPlugin.configuration().getConfigs()).filter(withHost(ghrpn.getHost())).first().orNull();
+		
+		//workaround for old 
+		//GitHubServerConfig ghsc = from(GitHubPlugin.configuration().getConfigs()).filter(withHost(ghrpn.getHost())).first().orNull();
+		//as access to FluentIterableWrapper is not allowed anymore
+		GitHubServerConfig ghsc = null;
+		List<GitHubServerConfig> allConfigs = GitHubPlugin.configuration().getConfigs();
+		for(GitHubServerConfig conf : allConfigs) {
+			if(withHost(ghrpn.getHost()).apply(conf)) {
+				ghsc = conf;
+				break;
+			}
+		}
 		
         accessToken = tokenFor(ghsc.getCredentialsId());
         apiUrl = ghsc.getApiUrl();
