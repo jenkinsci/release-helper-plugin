@@ -9,7 +9,6 @@ import com.atlassian.jira.rest.client.api.JiraRestClient;
 import com.atlassian.jira.rest.client.api.MetadataRestClient;
 import com.atlassian.jira.rest.client.api.VersionRestClient;
 import com.atlassian.jira.rest.client.api.domain.BasicIssue;
-import com.atlassian.jira.rest.client.api.domain.BasicIssueType;
 import com.atlassian.jira.rest.client.api.domain.BasicPriority;
 import com.atlassian.jira.rest.client.api.domain.Field;
 import com.atlassian.jira.rest.client.api.domain.Issue;
@@ -17,6 +16,7 @@ import com.atlassian.jira.rest.client.api.domain.IssueType;
 import com.atlassian.jira.rest.client.api.domain.Priority;
 import com.atlassian.jira.rest.client.api.domain.Project;
 import com.atlassian.jira.rest.client.api.domain.SearchResult;
+import com.atlassian.jira.rest.client.api.domain.Status;
 import com.atlassian.jira.rest.client.api.domain.Transition;
 import com.atlassian.jira.rest.client.api.domain.Version;
 import com.atlassian.jira.rest.client.api.domain.input.IssueInputBuilder;
@@ -150,10 +150,9 @@ public class JIRAAccessTool {
 	 */
 	public List<String> getAvailableIssueStatuses() {
 		List<String> names = new ArrayList<String>();
-		/*for(Status priority : restClient.getMetadataClient().getStatuses().claim()) {
-			names.add(priority.getName());
-		}*/
-		//TODO: not supported by now ?
+		for(Status status : restClient.getMetadataClient().getStatuses().claim()) {
+			names.add(status.getName());
+		}
 		return names;
 	}
 	
@@ -320,7 +319,7 @@ public class JIRAAccessTool {
 	 * 		the issue type (e.g. Task, bug, etc)
 	 * @return the created issue
 	 */
-	public BasicIssue addTicket(BuildingLambda<IssueInputBuilder> buildingFunction, BasicIssueType type) {
+	public BasicIssue addTicket(BuildingLambda<IssueInputBuilder> buildingFunction, IssueType type) {
 
 		Project project = restClient.getProjectClient().getProject(projectKey).claim();
 		IssueInputBuilder builder = new IssueInputBuilder(project, type);

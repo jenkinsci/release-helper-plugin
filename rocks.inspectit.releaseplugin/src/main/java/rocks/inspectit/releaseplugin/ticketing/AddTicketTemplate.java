@@ -9,23 +9,20 @@ import hudson.util.ComboBoxModel;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang.text.StrSubstitutor;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 
-import rocks.inspectit.releaseplugin.FieldMetadata;
 import rocks.inspectit.releaseplugin.IssueUpdateBuilder;
 import rocks.inspectit.releaseplugin.JIRAAccessTool;
-import rocks.inspectit.releaseplugin.JIRAMetadataCache;
 import rocks.inspectit.releaseplugin.JIRAAccessTool.BuildingLambda;
+import rocks.inspectit.releaseplugin.JIRAMetadataCache;
 
-import com.atlassian.jira.rest.client.api.domain.BasicIssueType;
 import com.atlassian.jira.rest.client.api.domain.BasicPriority;
 import com.atlassian.jira.rest.client.api.domain.Issue;
-import com.atlassian.jira.rest.client.api.domain.Version;
+import com.atlassian.jira.rest.client.api.domain.IssueType;
 import com.atlassian.jira.rest.client.api.domain.input.ComplexIssueInputFieldValue;
 import com.atlassian.jira.rest.client.api.domain.input.IssueInputBuilder;
 
@@ -152,7 +149,7 @@ public class AddTicketTemplate extends AbstractDescribableImpl<AddTicketTemplate
 		final String description = varReplacer.replace(this.description);
 		String parentJQL = varReplacer.replace(this.parentJQL);
 
-		BasicIssueType issueType = jira.getIssueTypeByName(type);
+		IssueType issueType = jira.getIssueTypeByName(type);
 		final BasicPriority issuePriority = jira.getIssuePriorityByName(priority);
 		String parentKey = null;
 		
